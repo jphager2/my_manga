@@ -55,6 +55,7 @@ PLATFORMS
 DEPENDENCIES
   activerecord
   mangdown
+  minitest
   sqlite3
 
 BUNDLED WITH

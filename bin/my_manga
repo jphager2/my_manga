@@ -1,0 +1,190 @@
+#!/usr/bin/ruby
+MANGA = {
+  "Assassination Classroom" => [0, 161],
+  "Naruto" => [669, 700],
+  "Naruto Movie" => [10, 10]
+}
+
+FETCHED_MANGA_CHAPTERS = {
+  "Assassination Classroom" => (1..166).to_a,
+  "Naruto" => (1..700).to_a,
+  "Naruto Movie" => (1..10).to_a
+}
+ 
+def find(manga)
+  manga = manga[1..-2] if manga[0] == manga[-1] && manga[0] == '"' || manga[0] == "'"
+  name = manga.split(/\s/).each(&:capitalize!).join(" ")
+  url = "http://www.mangareader.net/assassination-classroom"
+  found_line = "Manga found for \"#{manga}\""
+  break_line = "=" * found_line.length
+  header_line = "Name".ljust(name.length + 2, ' ') + "Url"
+  results_line = "#{name}  #{url}"
+
+  puts found_line
+  puts break_line
+  puts header_line
+  puts results_line
+end
+
+def list
+  column_width = MANGA.keys.map { |name| name.length }.max
+
+  puts "Manga list"
+  puts "=========="
+  puts "Name".ljust(column_width + 2, " ") + "Chapters (read/total)"
+  
+  MANGA.each do |name, (read, total)|
+    puts name.ljust(column_width + 2, " ") + "#{read}/#{total}"
+  end
+end
+
+def download(manga, chapters)
+end
+
+def unread_chapter_groups(manga)
+  Hash.new { |h,k| h[k] = [] }.merge(
+    "Assassination Classroom" => [(0..161)],
+    "Naruto" => [(669..700)],
+    "Naruto Movie" => []
+  )[manga]
+end
+
+def download_with_options(manga, options)
+  if options.empty?
+    manga.each do |name| 
+      total = MANGA[name][1]
+      groups = unread_chapter_groups(name) 
+      count = groups.inject(0) { |total, g| total + g.size }
+      puts "Downloading #{count} Chapters from \"#{name}\""
+      groups.each do |group|
+        download(name, group) 
+      end
+    end
+  else
+    # Do something with options
+  end
+  puts "Finished Download!"
+end
+
+def update(manga)
+  MANGA[manga][1] = FETCHED_MANGA_CHAPTERS[manga].length
+end
+
+def update_with_options(manga, options)
+  if options.empty?
+    puts "Fetching Manga"
+    puts "..."
+    manga.each do |name|
+      old_total = MANGA[name][1]
+      update(name)
+      new_total = MANGA[name][1]
+      updated = new_total - old_total
+      if updated > 0
+        puts "Updated \"#{name}\": #{updated} new Chapters."
+      end
+    end
+  else
+    # Do somethign with options
+  end
+end
+
+def mark(manga, flag, chapters)
+end
+
+def mark_with_options(manga, flag, options)
+  if options.has_key?(:list)
+    chapters = options.fetch(:list).split(',').map(&:to_i)
+
+    mark(manga, flag, chapters)
+
+    puts "Chapters #{chapters.join(', ')} from \"#{manga}\" Marked as Unread"
+  else
+    from = options.fetch(:from).to_i
+    to = options.fetch(:to).to_i
+
+    mark(manga, flag, from..to)
+
+    puts "Chapters #{from}-#{to} from \"#{manga}\" Marked as #{flag.capitalize}"
+  end
+end
+
+ARG_NAMES = {
+  n: :name,
+  a: :all,
+  f: :from,
+  t: :to,
+  l: :list
+}
+
+def options_from_args
+  options = {}
+  until ARGV.empty?
+    arg = ARGV.shift
+
+    case arg
+    when /^-{2}/
+      arg, *value = arg.split("=")
+      value = value.join # Allow values to contain "="
+
+      name = arg.sub(/^--/, "").to_sym
+    when /^-/
+      arg.sub!(/^-/, "")
+      value = ARGV.shift
+
+      name = ARG_NAMES[arg]
+    end
+
+    case name
+    when :all
+      options[:all] = true
+    when :from
+      options[:from] = value
+    when :to
+      options[:to] = value
+    when :list
+      value.gsub!(/[\[\]\s+]/, "")
+      value = value.split(",")
+      options[:list] = value
+    when :name
+      value.gsub!(/["']/, "")
+      options[:name] = value
+    end
+  end
+  options
+end
+
+action = ARGV.shift
+case action
+when "find"
+  find(ARGV[0]) if ARGV[0]
+when "list"
+  list
+when "download"
+  if !ARGV[0] || ARGV[0].start_with?("-")
+    manga = MANGA.keys
+  else
+    manga = ARGV.shift.gsub(/["']/, "")
+    manga = Array(manga)
+  end
+  download_with_options(manga, options_from_args)
+when "update"
+  if !ARGV[0] || ARGV[0].start_with?("-")
+    manga = MANGA.keys
+  else
+    manga = ARGV.shift.gsub(/["']/, "")
+    manga = Array(manga)
+  end
+  update_with_options(manga, options_from_args)
+when "mark"
+  if %w{ read unread }.include?(ARGV[0])
+    mark = ARGV.shift
+    manga = ARGV.find { |arg| !arg.start_with?("-") }
+    if manga
+      ARGV.delete(manga)
+      manga = manga.gsub(/["']/, "")
+      mark_with_options(manga, mark, options_from_args)
+    end
+  end
+else
+  puts ARGV.inspect
+end

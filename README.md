@@ -2,7 +2,7 @@
   my_manga find "assassination classroom"
 
   Manga found for "assassination classroom"
-  =======================================
+  =========================================
   Name                    Url
   Assasination Classroom  http://www.mangareader.net/assassination-classroom 
 
@@ -19,7 +19,7 @@
   Manga list
   =======================================
   Name                    Chapters (read/total)
-  Assasination Classroom  0/161 
+  Assassination Classroom  0/161 
   Naruto                  669/700
   Naruto Movie            10/10
 
@@ -34,11 +34,40 @@
 
   => nil
 
+  my_manga download "Assassination Classroom"
+
+  Downloading 0 Chapters from "Assassination Classroom"
+  Finished Download!
+
+  => nil
+
+  my_manga download "Assassination Classroom" --from=1 --to=10
+
+  Downloading 10 Chapters from "Assassination Classroom"
+  Finished Download!
+
+  => nil
+
+  my_manga download "Assassination Classroom" --list=[11,13,15]
+
+  Downloading 3 Chapters from "Assassination Classroom"
+  Finished Download!
+
+  => nil
+
   my_manga update
 
   Fetching Manga
   ...
   Updated "Assassination Classroom": 5 new Chapters.
+
+  => nil
+
+  my_manga update "Assassination Classroom"
+
+  Fetching Manga
+  ...
+  Nothing to Update
 
   => nil
 
@@ -81,13 +110,13 @@
 
   => nil
 
-  my_manga mark --read --from=162 --to=165 "Assassination Classroom"
+  my_manga mark read --from=162 --to=165 "Assassination Classroom"
 
   Chapters 162-165 from "Assination Classroom" Marked as Read
 
   => nil
 
-  my_manga mark --unread --list=[2,3,4,7,8] "Naruto Movie"
+  my_manga mark unread --list=[2,3,4,7,8] "Naruto Movie"
 
   Chapters 2, 3, 4, 7, 8 from "Naruto Movie" Marked as Unread
 
