@@ -110,13 +110,13 @@
 
   => nil
 
-  my_manga mark read --from=162 --to=165 "Assassination Classroom"
+  my_manga mark read "Assassination Classroom" --from=162 --to=165 
 
   Chapters 162-165 from "Assination Classroom" Marked as Read
 
   => nil
 
-  my_manga mark unread --list=[2,3,4,7,8] "Naruto Movie"
+  my_manga mark unread "Naruto Movie" --list=[2,3,4,7,8]
 
   Chapters 2, 3, 4, 7, 8 from "Naruto Movie" Marked as Unread
 

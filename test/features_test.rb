@@ -41,6 +41,30 @@ Naruto Movie             10/10
     assert_equal expected[0..2], output[0..2]
   end
 
+
+  def test_list_detail
+    stdin, stdout, stderr, wait_thr = Open3.popen3("my_manga", "list", '"Assassination Classroom"')
+    output = stdout.each_line.to_a
+    expected = <<-exp
+Manga details for "Assasination Classroom"
+=========================================
+Name                     Chapters (read/total)
+Assassination Classroom  161/166
+
+Chapters Read
+-------------
+Assasination Classroom 1
+Assasination Classroom 2
+Assasination Classroom 3
+...
+Assasination Classroom 161
+    exp
+    expected = expected.split("\n").map { |line| line << "\n" }
+
+    assert_equal 0, wait_thr.value
+    assert_equal expected[0..-2], output[0..-2]
+  end
+
   def test_download
     stdin, stdout, stderr, wait_thr = Open3.popen3("my_manga", "download")
     output = stdout.each_line.to_a
@@ -73,7 +97,7 @@ Updated "Assassination Classroom": 5 new Chapters.
   end
 
   def test_mark
-    stdin, stdout, stderr, wait_thr = Open3.popen3("my_manga", "mark", "read", "--from=162", "--to=165", '"Assassination Classroom"')
+    stdin, stdout, stderr, wait_thr = Open3.popen3("my_manga", "mark", "read", '"Assassination Classroom"', "--from=162", "--to=165")
     output = stdout.each_line.to_a
     expected = <<-exp
 Chapters 162-165 from "Assassination Classroom" Marked as Read
