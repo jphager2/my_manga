@@ -43,26 +43,28 @@ Naruto Movie             10/10
 
 
   def test_list_detail
-    stdin, stdout, stderr, wait_thr = Open3.popen3("my_manga", "list", '"Assassination Classroom"')
+    stdin, stdout, stderr, wait_thr = Open3.popen3("my_manga", "list", '"Naruto Movie"')
     output = stdout.each_line.to_a
     expected = <<-exp
-Manga details for "Assasination Classroom"
-=========================================
-Name                     Chapters (read/total)
-Assassination Classroom  161/166
+Manga details for "Naruto Movie"
+================================
+Name          Chapters (read/total)
+Naruto Movie  10/10
 
 Chapters Read
 -------------
-Assasination Classroom 1
-Assasination Classroom 2
-Assasination Classroom 3
+Naruto Movie 1
+Naruto Movie 2
+Naruto Movie 3
 ...
-Assasination Classroom 161
+Naruto Movie 10
     exp
     expected = expected.split("\n").map { |line| line << "\n" }
 
     assert_equal 0, wait_thr.value
-    assert_equal expected[0..-2], output[0..-2]
+    assert_equal expected[0..2], output[0..2]
+    assert_includes output[3], "Naruto Movie"
+    assert_equal expected[4..6], output[4..6]
   end
 
   def test_download

@@ -27,6 +27,28 @@ def find(manga)
 end
 
 def list_detail(manga)
+  read, total = MANGA[manga]
+  header = "Manga details for \"#{manga}\"" 
+  chapters = read_chapter_groups(manga).flat_map(&:to_a)
+
+  puts header
+  puts "=" * header.length
+  puts "Name".ljust(manga.length + 2, " ") + "Chapters (read/total)"
+  puts "#{manga}  #{read}/#{total}"
+  puts
+  puts "Chapters Read"
+  puts "-------------"
+  if chapters.length > 4
+    chapters[0..2].each do |n|
+      puts "#{manga} #{n}"
+    end
+    puts "..."
+    puts "#{manga} #{chapters[-1]}"
+  else
+    chapters[0..2].each do |n|
+      puts "#{manga} #{n}"
+    end
+  end
 end
 
 def list(manga)
@@ -50,9 +72,17 @@ end
 
 def unread_chapter_groups(manga)
   Hash.new { |h,k| h[k] = [] }.merge(
-    "Assassination Classroom" => [(0..161)],
+    "Assassination Classroom" => [(1..161)],
     "Naruto" => [(669..700)],
     "Naruto Movie" => []
+  )[manga]
+end
+
+def read_chapter_groups(manga)
+  Hash.new { |h,k| h[k] = [] }.merge(
+    "Assassination Classroom" => [(1..161)],
+    "Naruto" => [(1..700)],
+    "Naruto Movie" => [(1..10)]
   )[manga]
 end
 
