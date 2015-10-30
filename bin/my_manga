@@ -1,100 +1,103 @@
-#!/usr/bin/ruby
-MANGA = {
-  "Assassination Classroom" => [0, 161],
-  "Naruto" => [669, 700],
-  "Naruto Movie" => [10, 10]
-}
+#!/Users/jph/.rvm/rubies/ruby-2.1.5/bin/ruby
+
+require_relative '../db/environment'
+require_relative '../lib/my_manga'
 
 FETCHED_MANGA_CHAPTERS = {
   "Assassination Classroom" => (1..166).to_a,
   "Naruto" => (1..700).to_a,
   "Naruto Movie" => (1..10).to_a
 }
+
+FETCHED_MANGA_DATA = {
+  "assassination classroom" => [
+    { name: "Assassination Classroom", uri: "http://www.mangareader.net/assassination-classroom" }
+  ]
+}
  
-def find(manga)
-  manga = manga[1..-2] if manga[0] == manga[-1] && manga[0] == '"' || manga[0] == "'"
-  name = manga.split(/\s/).each(&:capitalize!).join(" ")
-  url = "http://www.mangareader.net/assassination-classroom"
-  found_line = "Manga found for \"#{manga}\""
-  break_line = "=" * found_line.length
-  header_line = "Name".ljust(name.length + 2, ' ') + "Url"
-  results_line = "#{name}  #{url}"
+def find(search)
+  data = FETCHED_MANGA_DATA[search]
 
-  puts found_line
-  puts break_line
-  puts header_line
-  puts results_line
-end
+  puts "Manga found for \"#{search}\""
+  puts "=" * (18 + search.length)
 
-def list_detail(manga)
-  read, total = MANGA[manga]
-  header = "Manga details for \"#{manga}\"" 
-  chapters = read_chapter_groups(manga).flat_map(&:to_a)
-
-  puts header
-  puts "=" * header.length
-  puts "Name".ljust(manga.length + 2, " ") + "Chapters (read/total)"
-  puts "#{manga}  #{read}/#{total}"
-  puts
-  puts "Chapters Read"
-  puts "-------------"
-  if chapters.length > 4
-    chapters[0..2].each do |n|
-      puts "#{manga} #{n}"
-    end
-    puts "..."
-    puts "#{manga} #{chapters[-1]}"
-  else
-    chapters[0..2].each do |n|
-      puts "#{manga} #{n}"
+  if data
+    column_width = data.map { |r| r[:name].length }.max
+    puts "Name".ljust(column_width + 2, ' ') + "Url"
+    data.each do |result|
+      puts result[:name].ljust(column_width + 2, " ") + result[:uri]
     end
   end
 end
 
-def list(manga)
-  if manga.length == 1
-    list_detail(manga[0])
+def add(uri)
+  if manga = MyManga.add(uri)
+    puts "\"#{manga.name}\" added to your library!"
+  end
+end
+
+def remove(name)
+  if MyManga.remove(name)
+    puts "\"#{name}\" removed from your library!"
+  end
+end
+
+def list_detail(name)
+  manga = MyManga[name]
+  header = "Manga details for \"#{manga.name}\"" 
+  chapters = manga.chapters_read
+
+  puts header
+  puts "=" * header.length
+  puts "Name".ljust(name.length + 2, " ") + "Chapters (read/total)"
+  puts "#{name}  #{manga.read_count}/#{manga.total_count}"
+  puts
+  puts "Chapters Read"
+  puts "-------------"
+  if chapters.length > 4
+    chapters[0..2].each do |chapter|
+      puts chapter.name
+    end
+    puts "..."
+    puts chapters[-1].name
   else
-    column_width = manga.map(&:length).max
+    chapters[0..2].each do |chapter|
+      puts chapter.name
+    end
+  end
+end
+
+def list(names)
+  if names.length == 1
+    list_detail(names[0])
+  else
+    column_width = names.map(&:length).max
 
     puts "Manga list"
     puts "=========="
     puts "Name".ljust(column_width + 2, " ") + "Chapters (read/total)"
     
-    MANGA.each do |name, (read, total)|
-      puts name.ljust(column_width + 2, " ") + "#{read}/#{total}"
+    names.each do |name|
+      manga = MyManga[name]
+      puts name.ljust(column_width + 2, " ") + "#{manga.read_count}/#{manga.total_count}"
     end
   end
 end
 
-def download(manga, chapters)
+def download(chapter)
+  MyManga.download(chapter)
 end
 
-def unread_chapter_groups(manga)
-  Hash.new { |h,k| h[k] = [] }.merge(
-    "Assassination Classroom" => [(1..161)],
-    "Naruto" => [(669..700)],
-    "Naruto Movie" => []
-  )[manga]
-end
-
-def read_chapter_groups(manga)
-  Hash.new { |h,k| h[k] = [] }.merge(
-    "Assassination Classroom" => [(1..161)],
-    "Naruto" => [(1..700)],
-    "Naruto Movie" => [(1..10)]
-  )[manga]
-end
-
-def download_with_options(manga, options)
+def download_with_options(names, options)
   if options.empty?
-    manga.each do |name| 
-      total = MANGA[name][1]
-      groups = unread_chapter_groups(name) 
-      count = groups.inject(0) { |total, g| total + g.size }
-      puts "Downloading #{count} Chapters from \"#{name}\""
-      groups.each do |group|
-        download(name, group) 
+    names.each do |name| 
+      manga = MyManga[name]
+      chapters = manga.chapters_unread
+      count = chapters.size
+
+      if count > 0
+        puts "Downloading #{count} Chapters from \"#{name}\""
+        chapters.each do |chapter| download(chapter) end
       end
     end
   else
@@ -104,17 +107,19 @@ def download_with_options(manga, options)
 end
 
 def update(manga)
-  MANGA[manga][1] = FETCHED_MANGA_CHAPTERS[manga].length
+  #MyManga.update(manga)
+  manga.update_chapters(FETCHED_MANGA_CHAPTERS[manga.name])
 end
 
-def update_with_options(manga, options)
+def update_with_options(names, options)
   if options.empty?
     puts "Fetching Manga"
     puts "..."
-    manga.each do |name|
-      old_total = MANGA[name][1]
-      update(name)
-      new_total = MANGA[name][1]
+    names.each do |name|
+      manga = MyManga[name]
+      old_total = manga.total_count
+      update(manga)
+      new_total = MyManga[name].total_count
       updated = new_total - old_total
       if updated > 0
         puts "Updated \"#{name}\": #{updated} new Chapters."
@@ -150,7 +155,7 @@ def mark_with_options(manga, flag, options)
 end
 
 def my_manga(names)
-  MANGA.keys & names
+  MyManga.names & names
 end
 
 require 'optparse'
@@ -188,11 +193,20 @@ def options_from_args(action)
   options
 end
 
+def sanitized_input(input)
+  if input[0] == input[-1] 
+    input = input.sub(/^["']/, "")
+    input.sub(/["']$/, "")
+  else
+    input
+  end
+end
+
 def manga_name_arg_or_all
   if !ARGV[0] || ARGV[0].start_with?("-")
-    MANGA.keys
+    MyManga.names
   else
-    manga = ARGV.shift.gsub(/["']/, "")
+    manga = sanitized_input(ARGV.shift)
     manga = Array(manga)
     my_manga(manga)
   end
@@ -201,7 +215,20 @@ end
 action = ARGV.shift
 case action
 when "find"
-  find(ARGV[0]) if ARGV[0]
+  if ARGV[0]
+    manga = sanitized_input(ARGV[0])
+    find(manga) 
+  end
+when "add"
+  if ARGV[0]
+    uri = sanitized_input(ARGV[0])
+    add(uri) 
+  end
+when "remove"
+  if ARGV[0]
+    manga = sanitized_input(ARGV[0])
+    remove(manga) 
+  end
 when "list"
   manga = manga_name_arg_or_all
   list(manga)
@@ -217,6 +244,8 @@ when "mark"
     manga = manga_name_arg_or_all
     mark_with_options(manga, mark, options_from_args(:mark))
   end
+when "env"
+  puts MyManga.env
 else
   puts ARGV.inspect
 end

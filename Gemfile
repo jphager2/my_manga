@@ -1,7 +1,7 @@
 source 'https://rubygems.org'
 
-gem 'mangdown'
-gem 'sqlite3'
+gem 'mangdown', '~> 0.12'
+gem 'pg'
 gem 'activerecord'
 
 group :test do

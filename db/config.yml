@@ -1,0 +1,19 @@
+default: &default
+  adapter: postgresql
+  encoding: unicode
+  # For details on connection pooling, see rails configuration guide
+  # http://guides.rubyonrails.org/configuring.html#database-pooling
+  pool: 5
+  host: <%= ENV["PG_HOST"] %>
+  reconnect: false
+  # Set these in .bashrc or .bash_profile
+  username: <%= ENV["PG_USER"] %> 
+  password: <%= ENV["PG_PASS"] %>
+
+production:
+  <<: *default
+  database: my_manga_library_database
+
+test:
+  <<: *default
+  database: my_manga_library_test_database

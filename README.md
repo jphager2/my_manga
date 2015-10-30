@@ -13,6 +13,12 @@
   "Assassination Classroom" added to your library!
 
   => nil
+  
+  my_manga remove "Assassination Classroom"
+
+  "Assassination Classroom" removed from your library!
+
+  => nil
 
   my_manga list
 

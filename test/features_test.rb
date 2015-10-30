@@ -3,10 +3,14 @@ require 'open3'
 
 class FeaturesTest < Minitest::Test
 
+  def test_env
+    assert_includes `my_manga env`, "test"
+  end
+
   def test_binary
     stdin, stdout, stderr, wait_thr = Open3.popen3("my_manga")
 
-    assert_equal 0, wait_thr.value
+    assert_equal 0, wait_thr.value 
   end
 
   def test_find
@@ -22,6 +26,32 @@ Assassination Classroom  http://www.mangareader.net/assassination-classroom
 
     assert_equal 0, wait_thr.value
     assert_equal expected[0..2], output[0..2]
+  end
+
+  def test_add
+    stdin, stdout, stderr, wait_thr = Open3.popen3("my_manga", "add", 'http://www.mangareader.net/assassination-classroom')
+    output = stdout.each_line.to_a
+    expected = <<-exp
+"Assassination Classroom" added to your library!
+    exp
+
+    expected = expected.split("\n").map { |line| line << "\n" }
+
+    assert_equal 0, wait_thr.value
+    assert_equal expected, output
+  end
+
+  def test_remove
+    stdin, stdout, stderr, wait_thr = Open3.popen3("my_manga", "remove", '"Assassination Classroom"')
+    output = stdout.each_line.to_a
+    expected = <<-exp
+"Assassination Classroom" removed from your library!
+    exp
+
+    expected = expected.split("\n").map { |line| line << "\n" }
+
+    assert_equal 0, wait_thr.value
+    assert_equal expected, output
   end
 
   def test_list
@@ -83,7 +113,7 @@ Finished Download!
     assert_equal expected[-1], output[-1]
   end
 
-  def test_download
+  def test_update
     stdin, stdout, stderr, wait_thr = Open3.popen3("my_manga", "update")
     output = stdout.each_line.to_a
     expected = <<-exp
