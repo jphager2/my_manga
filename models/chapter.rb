@@ -5,10 +5,18 @@ class Chapter < ActiveRecord::Base
   scope :unread, Proc.new { where(read: false) }
 
   def self.from_md(md_chapter)
-    create(name: md_chapter.name, uri: md_chapter.uri, number: md_chapter.chapter)
+    uri = md_chapter.uri
+    name = md_chapter.name
+    chapter = name.slice(/\d+\z/).to_i 
+
+    find_or_create_by(name: name, uri: uri, number: chapter)
   end
 
   def to_md
-    MDHash.new(name: name, uri: uri).to_chapter
+    Mangdown::MDHash.new(name: name, uri: uri).to_chapter
+  end
+
+  def self.numbers
+    pluck(:number)
   end
 end

@@ -23,17 +23,55 @@ module MyManga
     end
   end
 
-  def self.update(name)
+  def self.fetch_chapters(manga, numbers)
+    manga.chapters.where(number: numbers)
+  end
+
+  # This should be private
+  def self.set_read(manga, numbers, bool)
+    chapters = fetch_chapters(manga, numbers)
+    chapters.update_all(read: bool)
+    manga.reload
+    manga.read_count = manga.chapters_read.length
+    manga.save
+  end
+
+  def self.read!(manga, numbers)
+    set_read(manga, numbers, true)
+  end
+
+  def self.unread!(manga, numbers)
+    set_read(manga, numbers, false)
+  end
+
+  def self.update(manga)
     md_manga = manga.to_md
-    chapters = md_chapter.chapters
+    chapters = md_manga.chapters
     manga.update_chapters(chapters)
   end
 
-  def self.download(chapter)
-    #md_chapter = chapter.to_md
-    #md_chapter.download
-    chapter.read = true
-    chapter.save
+  # Should be private
+  def self.create_manga_download_dir(manga)
+    base = MyManga.download_dir
+    manga_dir = [base, manga.name].join("/")
+    Dir.create(base) unless Dir.exist?(base)
+    Dir.create(manga_dir) unless Dir.exist?(manga_dir)
+    manga_dir
+  end
+
+  def self.download_chapter(chapter, download_dir)
+    md_chapter = chapter.to_md
+    md_chapter.download_to(download_dir)
+  end
+
+  def self.download(manga, numbers)
+    download_dir = create_manga_download_dir(manga)
+    chapters = fetch_chapters(manga, numbers)
+
+    chapters.each do |chapter|
+      download_chapter(chapter, download_dir)
+    end
+    read!(manga, numbers)
   end
 
   def self.read_chapter_groups(name)

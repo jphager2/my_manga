@@ -2,8 +2,8 @@ class AddTables < ActiveRecord::Migration
   create_table :manga do |t|
     t.string :name
     t.string :uri
-    t.integer :read_count
-    t.integer :total_count
+    t.integer :read_count, default: 0
+    t.integer :total_count, default: 0
 
     t.timestamps null: false
   end

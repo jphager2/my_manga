@@ -10,6 +10,14 @@ module MyManga
   def self.env=(environment)
     ENV["MY_MANGA_ENV"] = environment
   end
+
+  def self.download_dir
+    ENV["MY_MANGA_DOWNLOAD_DIR"] || Dir.home
+  end
+
+  def self.manga_download_dir=(dir)
+    ENV["MY_MANGA_DOWNLOAD_DIR"] = dir
+  end
 end
 
 require_relative '../db/connection.rb'

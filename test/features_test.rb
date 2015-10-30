@@ -29,10 +29,10 @@ Assassination Classroom  http://www.mangareader.net/assassination-classroom
   end
 
   def test_add
-    stdin, stdout, stderr, wait_thr = Open3.popen3("my_manga", "add", 'http://www.mangareader.net/assassination-classroom')
+    stdin, stdout, stderr, wait_thr = Open3.popen3("my_manga", "add", 'http://www.mangareader.net/nisekoi')
     output = stdout.each_line.to_a
     expected = <<-exp
-"Assassination Classroom" added to your library!
+"Nisekoi" added to your library!
     exp
 
     expected = expected.split("\n").map { |line| line << "\n" }

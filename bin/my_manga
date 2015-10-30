@@ -68,10 +68,10 @@ def list_detail(name)
 end
 
 def list(names)
-  if names.length == 1
+  if names.length == 1 
     list_detail(names[0])
   else
-    column_width = names.map(&:length).max
+    column_width = names.map(&:length).max || 10
 
     puts "Manga list"
     puts "=========="
@@ -84,31 +84,29 @@ def list(names)
   end
 end
 
-def download(chapter)
-  MyManga.download(chapter)
-end
-
 def download_with_options(names, options)
-  if options.empty?
-    names.each do |name| 
-      manga = MyManga[name]
-      chapters = manga.chapters_unread
-      count = chapters.size
-
-      if count > 0
-        puts "Downloading #{count} Chapters from \"#{name}\""
-        chapters.each do |chapter| download(chapter) end
-      end
+  names.each do |name| 
+    manga = MyManga[name]
+    if options.empty? || options[:all]
+      numbers = manga.chapters_unread_numbers
+    else
+      numbers = options.fetch(:list) { 
+        (options.fetch(:from)..options.fetch(:to)).to_a
+      }
     end
-  else
-    # Do something with options
+    count = numbers.length
+
+    if count > 0
+      puts "Downloading #{count} Chapters from \"#{name}\""
+      MyManga.download(manga, numbers)
+    end
   end
   puts "Finished Download!"
 end
 
 def update(manga)
-  #MyManga.update(manga)
-  manga.update_chapters(FETCHED_MANGA_CHAPTERS[manga.name])
+  MyManga.update(manga)
+  #manga.update_chapters(FETCHED_MANGA_CHAPTERS[manga.name])
 end
 
 def update_with_options(names, options)
@@ -131,26 +129,28 @@ def update_with_options(names, options)
 end
 
 def mark(manga, flag, chapters)
+  if flag == "read"
+    MyManga.read!(manga, chapters)
+  else
+    MyManga.unread!(manga, chapters)
+  end
 end
 
-def mark_with_options(manga, flag, options)
+def mark_with_options(names, flag, options)
   if options.has_key?(:list)
     chapters = options.fetch(:list).map(&:to_i)
-
-    manga.each do |name|
-      mark(name, flag, chapters)
-
-      puts "Chapters #{chapters.join(', ')} from \"#{name}\" Marked as Unread"
-    end
+    output =  chapters.join(', ')
   else
     from = options.fetch(:from).to_i
     to = options.fetch(:to).to_i
+    chapters = (from..to).to_a
+    output = "#{from}-#{to}"
+  end
 
-    manga.each do |name|
-      mark(name, flag, from..to)
-
-      puts "Chapters #{from}-#{to} from \"#{name}\" Marked as #{flag.capitalize}"
-    end
+  names.each do |name|
+    manga = MyManga[name]
+    mark(manga, flag, chapters)
+    puts "Chapters #{output} from \"#{name}\" Marked as #{flag.capitalize}"
   end
 end
 
@@ -243,6 +243,8 @@ when "mark"
     mark = ARGV.shift
     manga = manga_name_arg_or_all
     mark_with_options(manga, mark, options_from_args(:mark))
+  else
+    raise ArgumentError, "`mark` requires either `read` or `unread`"
   end
 when "env"
   puts MyManga.env
