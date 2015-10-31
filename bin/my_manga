@@ -3,25 +3,13 @@
 require_relative '../db/environment'
 require_relative '../lib/my_manga'
 
-FETCHED_MANGA_CHAPTERS = {
-  "Assassination Classroom" => (1..166).to_a,
-  "Naruto" => (1..700).to_a,
-  "Naruto Movie" => (1..10).to_a
-}
-
-FETCHED_MANGA_DATA = {
-  "assassination classroom" => [
-    { name: "Assassination Classroom", uri: "http://www.mangareader.net/assassination-classroom" }
-  ]
-}
- 
 def find(search)
-  data = FETCHED_MANGA_DATA[search]
+  data = MyManga.find(search)
 
   puts "Manga found for \"#{search}\""
   puts "=" * (18 + search.length)
 
-  if data
+  if data.length > 0
     column_width = data.map { |r| r[:name].length }.max
     puts "Name".ljust(column_width + 2, ' ') + "Url"
     data.each do |result|
@@ -104,11 +92,6 @@ def download_with_options(names, options)
   puts "Finished Download!"
 end
 
-def update(manga)
-  MyManga.update(manga)
-  #manga.update_chapters(FETCHED_MANGA_CHAPTERS[manga.name])
-end
-
 def update_with_options(names, options)
   if options.empty?
     puts "Fetching Manga"
@@ -116,7 +99,7 @@ def update_with_options(names, options)
     names.each do |name|
       manga = MyManga[name]
       old_total = manga.total_count
-      update(manga)
+      MyManga.update(manga)
       new_total = MyManga[name].total_count
       updated = new_total - old_total
       if updated > 0

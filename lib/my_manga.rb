@@ -5,6 +5,14 @@ module MyManga
     Manga.find_by(name: name)
   end
 
+  def self.find(search)
+    M.find(search)
+  end
+
+  def self.package(dir)
+    Mangdown::CBZ.all(dir)
+  end
+
   def self.names
     Manga.pluck(:name)
   end
@@ -54,8 +62,8 @@ module MyManga
   def self.create_manga_download_dir(manga)
     base = MyManga.download_dir
     manga_dir = [base, manga.name].join("/")
-    Dir.create(base) unless Dir.exist?(base)
-    Dir.create(manga_dir) unless Dir.exist?(manga_dir)
+    Dir.mkdir(base) unless Dir.exist?(base)
+    Dir.mkdir(manga_dir) unless Dir.exist?(manga_dir)
     manga_dir
   end
 
@@ -71,6 +79,7 @@ module MyManga
     chapters.each do |chapter|
       download_chapter(chapter, download_dir)
     end
+    package(download_dir)
     read!(manga, numbers)
   end
 
