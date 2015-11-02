@@ -2,6 +2,7 @@ require 'minitest/autorun'
 require 'minitest/pride'
 
 ENV["MY_MANGA_ENV"] = "test"
+ENV["MY_MANGA_DOWNLOAD_DIR"] = File.expand_path("../downloads", __FILE__)
 
 require_relative "../db/environment"
 
