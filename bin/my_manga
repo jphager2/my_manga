@@ -34,11 +34,14 @@ def list_detail(name)
   manga = MyManga[name]
   header = "Manga details for \"#{manga.name}\"" 
   chapters = manga.chapters_read
+  read = manga.read_count
+  total = manga.total_count
+  unread = total - read
 
   puts header
   puts "=" * header.length
-  puts "Name".ljust(name.length + 2, " ") + "Chapters (read/total)"
-  puts "#{name}  #{manga.read_count}/#{manga.total_count}"
+  puts "Name".ljust(name.length + 2, " ") + "Chapters read/total (unread)"
+  puts "#{name}  #{read}/#{total} (#{unread})"
   puts
   puts "Chapters Read"
   puts "-------------"
@@ -63,11 +66,14 @@ def list(names)
 
     puts "Manga list"
     puts "=========="
-    puts "Name".ljust(column_width + 2, " ") + "Chapters (read/total)"
+    puts "Name".ljust(column_width + 2, " ") + "Chapters read/total (unread)"
     
     names.each do |name|
       manga = MyManga[name]
-      puts name.ljust(column_width + 2, " ") + "#{manga.read_count}/#{manga.total_count}"
+      read = manga.read_count
+      total = manga.total_count
+      unread = total - read
+      puts name.ljust(column_width + 2, " ") + "#{read}/#{total} (#{unread})"
     end
   end
 end
