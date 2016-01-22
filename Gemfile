@@ -1,6 +1,6 @@
 source 'https://rubygems.org'
 
-gem 'mangdown', '~> 0.12'
+gem 'mangdown', '~> 0.13'
 gem 'pg'
 gem 'activerecord'
 
