@@ -73,7 +73,7 @@ def list(names)
       read = manga.read_count
       total = manga.total_count
       unread = total - read
-      puts name.ljust(column_width + 2, " ") + "#{read}/#{total} (#{unread})"
+      puts name.ljust(column_width + 2, " ") + "#{read}/#{total} (#{unread}) #{manga.uri}"
     end
   end
 end

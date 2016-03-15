@@ -23,7 +23,7 @@ class Manga < ActiveRecord::Base
   end
 
   def to_md
-    Mangdown::MDHash.new(name: name, uri: uri).to_manga
+    ::Mangdown::MDHash.new(name: name, uri: uri).to_manga
   end
 
   def chapters

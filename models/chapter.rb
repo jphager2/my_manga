@@ -13,7 +13,7 @@ class Chapter < ActiveRecord::Base
   end
 
   def to_md
-    Mangdown::MDHash.new(name: name, uri: uri).to_chapter
+    ::Mangdown::MDHash.new(name: name, uri: uri).to_chapter
   end
 
   def self.numbers
