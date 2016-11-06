@@ -1,7 +1,7 @@
 class Manga < ActiveRecord::Base
   self.table_name = "manga"
 
-  has_many :chapters
+  has_many :chapters, dependent: :destroy
 
   delegate :read, :unread, to: :chapters, prefix: true, allow_nil: false
   delegate :numbers, to: :chapters_unread, prefix: true, allow_nil: false
