@@ -68,7 +68,7 @@ def list(names)
     puts "=========="
     puts "Name".ljust(column_width + 2, " ") + "Chapters read/total (unread)"
     
-    names.each do |name|
+    names.sort.each do |name|
       manga = MyManga[name]
       read = manga.read_count
       total = manga.total_count
