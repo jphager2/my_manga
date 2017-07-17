@@ -1,3 +1,5 @@
+TODO: Check out http://piotrmurach.github.io/tty/gems/ to make this gem better
+
 ```
   my_manga find "assassination classroom"
 

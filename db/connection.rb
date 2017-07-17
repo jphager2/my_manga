@@ -34,6 +34,10 @@ module MyManga
     def self.migrate
       ActiveRecord::Migrator.migrate(MIGRATION_PATH, nil)
     end
+
+    def self.dump
+      system("pg_dump -Fc #{CONFIG["database"]} > #{File.expand_path(__dir__)}/latest.dump")
+    end
   end
 end
 

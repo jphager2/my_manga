@@ -17,4 +17,8 @@ namespace :db do
     MyManga::DB.establish_connection 
     MyManga::DB.migrate
   end
+
+  task :dump do
+    MyManga::DB.dump
+  end
 end
