@@ -1,4 +1,4 @@
-require 'mangdown'
+require 'mangdown/client'
 
 module MyManga
   def self.[](name)
@@ -6,7 +6,7 @@ module MyManga
   end
 
   def self.find(search)
-    M.find(search)
+    M.find(Regexp.new(search, 'i'))
   end
 
   def self.package(dir)
