@@ -1,4 +1,4 @@
-class AddTables < ActiveRecord::Migration
+class AddTables < ActiveRecord::Migration[4.2]
   create_table :manga do |t|
     t.string :name
     t.string :uri

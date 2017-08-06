@@ -1,4 +1,4 @@
-#!/Users/jph/.rvm/rubies/ruby-2.1.5/bin/ruby
+#!/usr/bin/env ruby
 
 require_relative '../db/environment'
 require_relative '../lib/my_manga'
@@ -237,6 +237,8 @@ when "mark"
   end
 when "env"
   puts MyManga.env
+when "m:clean_up"
+  puts MyManga.mangdown_client_clean_up
 else
   puts ARGV.inspect
 end
