@@ -1,4 +1,8 @@
 require 'mangdown/client'
+require_relative 'mangdown/adapters/manga_here'
+
+Mangdown.register_adapter(:manga_here, MangaHere)
+M::MANGA_PAGES << 'http://www.mangahere.co/mangalist/'
 
 module MyManga
   def self.[](name)
@@ -19,7 +23,7 @@ module MyManga
 
   def self.add(uri)
     if Manga.find_by_uri(uri).nil?
-      md_manga = Mangdown::Manga.new(uri)
+      md_manga = Mangdown::MDHash.new(uri: uri).to_manga
       Manga.from_md(md_manga)
     end
   end
@@ -95,6 +99,10 @@ module MyManga
         end
       end
     }
+  end
+
+  def self.mangdown_client_clean_up
+    M.clean_up
   end
 end
 
