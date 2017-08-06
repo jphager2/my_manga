@@ -7,7 +7,7 @@ class Chapter < ActiveRecord::Base
   def self.from_md(md_chapter)
     uri = md_chapter.uri
     name = md_chapter.name
-    chapter = name.slice(/\d+\z/).to_i 
+    chapter = md_chapter.chapter
 
     find_or_create_by(name: name, uri: uri, number: chapter)
   end
