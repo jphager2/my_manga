@@ -54,11 +54,12 @@ class MangaHere < Mangdown::Adapter::Base
 
   # Return Array of Hash with keys: :uri, :name, :site
   def chapter_list
-    doc.css('.manga_detail .detail_list ul').first.css('li a').map { |a| 
+    doc.css('.manga_detail .detail_list ul').first.css('li a').map do |a|
       uri = URI.join(root, a[:href]).to_s
       name = a.text.strip
 
-      { uri: uri, name: name, site: site }}
+      { uri: uri, name: name, site: site }
+    end.reverse
   end
 
   # Return Hash with keys: :uri, :name, :chapter, :manga, :site
