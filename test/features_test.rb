@@ -1,39 +1,83 @@
+# frozen_string_literal: true
+
 require_relative 'test_helper'
 require 'open3'
 
 class FeaturesTest < Minitest::Test
+  # TODO: Improve testing so that setup doesn't need to be run each time,
+  #       or maybe fake the database.
+  def setup
+    Manga.create(
+      [
+        {
+          name: 'Assassination Classroom',
+          read_count: 0,
+          total_count: 161,
+          uri: 'http://www.mangareader.net/assassination-classroom'
+        },
+        {
+          name: 'Naruto',
+          read_count: 699,
+          total_count: 700,
+          uri: 'http://www.mangareader.net/naruto'
+        },
+        {
+          name: 'Naruto Movie',
+          read_count: 10,
+          total_count: 10,
+          uri: 'http://www.mangareader.net/naruto-movie'
+        }
+      ]
+    )
+
+    Manga.all.each do |manga|
+      manga.total_count.times do |t|
+        Chapter.create(
+          manga: manga,
+          name: "#{manga.name} #{t + 1}",
+          uri: "#{manga.uri}/#{t + 1}",
+          read: manga.read_count > t
+        )
+      end
+    end
+  end
+
+  def teardown
+    Manga.destroy_all
+    Chapter.destroy_all
+  end
 
   def test_env
-    assert_includes `my_manga env`, "test"
+    assert_includes `my_manga env`, 'test'
   end
 
   def test_binary
-    stdin, stdout, stderr, wait_thr = Open3.popen3("my_manga")
+    _, _, _, wait_thr = Open3.popen3('my_manga', 'list', '--help')
 
-    assert_equal 0, wait_thr.value 
+    assert_equal 0, wait_thr.value
   end
 
   def test_find
-    stdin, stdout, stderr, wait_thr = Open3.popen3("my_manga", "find", '"assassination classroom"')
-    output = stdout.each_line.to_a
-    expected = <<-exp
-Manga found for "assassination classroom"
-=========================================
-Name                     Url
-Assassination Classroom  http://www.mangareader.net/assassination-classroom
-    exp
-    expected = expected.split("\n").map { |line| line << "\n" }
+    _, stdout, _, wait_thr = Open3.popen3(
+      'my_manga', 'find', 'assassination classroom'
+    )
+    output = stdout.read
+    header = 'Manga found for "assassination classroom"'
+    url = 'http://www.mangareader.net/assassination-classroom'
 
     assert_equal 0, wait_thr.value
-    assert_equal expected[0..2], output[0..2]
+    assert_includes output, header
+    assert_includes output, url
   end
 
   def test_add
-    stdin, stdout, stderr, wait_thr = Open3.popen3("my_manga", "add", 'http://www.mangareader.net/nisekoi')
+    _, stdout, _, wait_thr = Open3.popen3(
+      'my_manga', 'add', 'http://www.mangareader.net/nisekoi'
+    )
     output = stdout.each_line.to_a
-    expected = <<-exp
-"Nisekoi" added to your library!
-    exp
+    expected = <<~EXP
+      "Nisekoi" added to your library!
+    EXP
 
     expected = expected.split("\n").map { |line| line << "\n" }
 
@@ -42,11 +86,13 @@ Assassination Classroom  http://www.mangareader.net/assassination-classroom
   end
 
   def test_remove
-    stdin, stdout, stderr, wait_thr = Open3.popen3("my_manga", "remove", '"Assassination Classroom"')
+    _, stdout, _, wait_thr = Open3.popen3(
+      'my_manga', 'remove', 'Assassination Classroom'
+    )
     output = stdout.each_line.to_a
-    expected = <<-exp
-"Assassination Classroom" removed from your library!
-    exp
+    expected = <<~EXP
+      "Assassination Classroom" removed from your library!
+    EXP
 
     expected = expected.split("\n").map { |line| line << "\n" }
 
@@ -55,91 +101,88 @@ Assassination Classroom  http://www.mangareader.net/assassination-classroom
   end
 
   def test_list
-    stdin, stdout, stderr, wait_thr = Open3.popen3("my_manga", "list")
+    _, stdout, _, wait_thr = Open3.popen3('my_manga', 'list')
     output = stdout.each_line.to_a
-    expected = <<-exp
-Manga list
-==========
-Name                     Chapters (read/total)
-Assassination Classroom  0/161
-Naruto                   669/700
-Naruto Movie             10/10
-    exp
+    expected = <<~EXP
+      Manga list
+      ==========
+      Name                     Chapters read/total (unread)
+      Assassination Classroom  0/161 (161) http://www.mangareader.net/assassination-classroom
+      Naruto                   699/700 (1) http://www.mangareader.net/naruto
+      Naruto Movie             10/10 (0) http://www.mangareader.net/naruto-movie
+    EXP
     expected = expected.split("\n").map { |line| line << "\n" }
 
     assert_equal 0, wait_thr.value
-    assert_equal expected[0..2], output[0..2]
+    assert_equal expected, output
   end
 
-
   def test_list_detail
-    stdin, stdout, stderr, wait_thr = Open3.popen3("my_manga", "list", '"Naruto Movie"')
+    _, stdout, _, wait_thr = Open3.popen3('my_manga', 'list', 'Naruto Movie')
     output = stdout.each_line.to_a
-    expected = <<-exp
-Manga details for "Naruto Movie"
-================================
-Name          Chapters (read/total)
-Naruto Movie  10/10
+    expected = <<~EXP
+      Manga details for "Naruto Movie"
+      ================================
+      Name          Chapters read/total (unread)
+      Naruto Movie  10/10 (0) http://www.mangareader.net/naruto-movie
 
-Chapters Read
--------------
-Naruto Movie 1
-Naruto Movie 2
-Naruto Movie 3
-...
-Naruto Movie 10
-    exp
+      Chapters Read
+      -------------
+      Naruto Movie 1
+      Naruto Movie 2
+      Naruto Movie 3
+      ...
+      Naruto Movie 10
+    EXP
     expected = expected.split("\n").map { |line| line << "\n" }
 
     assert_equal 0, wait_thr.value
-    assert_equal expected[0..2], output[0..2]
-    assert_includes output[3], "Naruto Movie"
-    assert_equal expected[4..6], output[4..6]
+    assert_equal expected, output
   end
 
   def test_download
-    stdin, stdout, stderr, wait_thr = Open3.popen3("my_manga", "download")
-    output = stdout.each_line.to_a
-    expected = <<-exp
-Downloading 161 Chapters from "Assassination Classroom"
-Downloading 1 Chapters from "Naruto"
-...
-Finished Download!
-    exp
-
-    expected = expected.split("\n").map { |line| line << "\n" }
+    _, stdout, _, wait_thr = Open3.popen3('my_manga', 'download')
+    output = stdout.read
+    expected = <<~EXP
+      Downloading 161 Chapters from "Assassination Classroom"
+      Downloading 1 Chapters from "Naruto"
+      ...
+      Finished Download!
+    EXP
 
     assert_equal 0, wait_thr.value
-    assert_equal expected[-1], output[-1]
+    assert_equal expected, output
   end
 
   def test_update
-    stdin, stdout, stderr, wait_thr = Open3.popen3("my_manga", "update")
-    output = stdout.each_line.to_a
-    expected = <<-exp
-Fetching Manga
-...
-Updated "Assassination Classroom": 5 new Chapters.
-    exp
-
-    expected = expected.split("\n").map { |line| line << "\n" }
+    _, stdout, _, wait_thr = Open3.popen3('my_manga', 'update')
+    output = stdout.read
+    expected = <<~EXP
+      Fetching Manga
+      ...
+    EXP
 
     assert_equal 0, wait_thr.value
-    assert_equal expected[0..1], output[0..1]
+    assert_equal expected, output
   end
 
   def test_mark
-    stdin, stdout, stderr, wait_thr = Open3.popen3("my_manga", "mark", "read", '"Assassination Classroom"', "--from=162", "--to=165")
+    _, stdout, _, wait_thr = Open3.popen3(
+      'my_manga',
+      'mark',
+      'read',
+      'Assassination Classroom',
+      '--from=162',
+      '--to=165'
+    )
     output = stdout.each_line.to_a
-    expected = <<-exp
-Chapters 162-165 from "Assassination Classroom" Marked as Read
-    exp
+    expected = <<~EXP
+      Chapters 162-165 from "Assassination Classroom" Marked as Read
+    EXP
 
     expected = expected.split("\n").map { |line| line << "\n" }
 
     assert_equal 0, wait_thr.value
     assert_equal expected[0..1], output[0..1]
   end
-
 end
-
