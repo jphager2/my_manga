@@ -54,31 +54,28 @@ class MangaHere < Mangdown::Adapter::Base
 
   # Return Array of Hash with keys: :uri, :name, :site
   def chapter_list
-    doc.css('.manga_detail .detail_list ul').first.css('li a').map do |a|
+    chapters = doc.css('.manga_detail .detail_list ul').first.css('li a')
+    chapters.reverse.map.with_index do |a, i|
       uri = URI.join(root, a[:href]).to_s
       name = a.text.strip
 
-      { uri: uri, name: name, site: site }
-    end.reverse
+      { uri: uri, name: name, chapter: i + 1, site: site }
+    end
   end
 
   # Return Hash with keys: :uri, :name, :chapter, :manga, :site
   #
   def chapter
     name ||= chapter_name
-    manga = doc.css('.title h2').text.strip.sub(/ Manga\Z/, '')
-    chapters = doc.css('#top_chapter_list option')
-    chapter = chapters.find_index do |chapter|
-      option_url = chapter.attributes["value"].to_s
-      uri[option_url]
-    end.to_i + 1
+    chapter ||= name.slice(/[\d\.]+$/)
+    manga = name.sub(/ #{chapter}\Z/, '').strip
 
     { uri: uri, name: name, chapter: chapter, manga: manga, site: site }
   end
 
   # Return Array of Hash with keys: :uri, :name, :site
   def page_list
-    doc.css('.wid60').first.css('option').map do |option| 
+    doc.css('.wid60').first.css('option').map do |option|
       uri = URI.join(root, option[:value]).to_s
       name = option.text
 
@@ -88,7 +85,7 @@ class MangaHere < Mangdown::Adapter::Base
 
   # Return Hash with keys: :uri, :name, :site
   def page
-    if name.nil? 
+    if name.nil?
       option = doc.css('.wid60 option[selected]').first
       name = "#{chapter_name} - #{option.text.strip.rjust(3, '0')}"
     end
@@ -102,7 +99,7 @@ class MangaHere < Mangdown::Adapter::Base
   private
 
   def chapter_name
-    doc.css('.title h1').text.strip
+    CGI.unescapeHTML(doc.css('.title h1').text.strip)
   end
 end
 

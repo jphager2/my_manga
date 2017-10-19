@@ -8,9 +8,12 @@ class Chapter < ActiveRecord::Base
     uri = md_hash.uri
     name = md_hash.name
     site = md_hash.site
+    number = md_hash.chapter
 
-    adapter = Mangdown.adapter!(uri, site, nil, name)
-    number = adapter.chapter[:chapter]
+    unless number
+      adapter = Mangdown.adapter!(uri, site, nil, name)
+      number = adapter.chapter[:chapter]
+    end
 
     find_or_create_by(name: name, uri: uri, number: number)
   end
