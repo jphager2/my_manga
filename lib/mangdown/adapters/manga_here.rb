@@ -1,21 +1,32 @@
 class MangaHere < Mangdown::Adapter::Base
   site :manga_here
 
-  ROOT = 'http://www.mangahere.co/'
-  CDN = 'http://l.mhcdn.net/store/manga/'
+  ROOT = 'http://www.mangahere.co/'.freeze
+  CDNS = [
+    'http://l.mhcdn.net/store/manga/',
+    'https://mhcdn.secure.footprint.net/store/manga/'
+  ].freeze
 
   attr_reader :root
 
   def self.for?(uri_or_site)
     uri_or_site.to_s.start_with?(ROOT) ||
-      uri_or_site.start_with?(CDN) ||
+      cdn_uri?(uri_or_site) ||
       uri_or_site.to_s == 'manga_here'
+  end
+
+  def self.cdn_uri?(uri)
+    CDNS.any? { |cdn| uri.to_s.start_with?(cdn) }
   end
 
   def initialize(uri, doc, name)
     super
 
     @root = ROOT
+  end
+
+  def hydra_opts
+    { max_concurrency: 1 }
   end
 
   def is_manga_list?(uri = @uri)
@@ -34,7 +45,7 @@ class MangaHere < Mangdown::Adapter::Base
 
   # Must return true/false if uri represents a page for adapter
   def is_page?(uri = @uri)
-    uri.start_with?(CDN)
+    self.class.cdn_uri?(uri)
   end
 
   # Return Array of Hash with keys: :uri, :name, :site
