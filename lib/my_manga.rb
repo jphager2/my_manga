@@ -103,7 +103,4 @@ module MyManga
     Dir.mkdir(manga_dir) unless Dir.exist?(manga_dir)
     manga_dir
   end
-
 end
-
-

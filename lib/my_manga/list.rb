@@ -8,7 +8,7 @@ module MyManga
         desc 'View your manga list'
         argument :names, desc: 'Manga names (comma separated)'
 
-        def call(names:)
+        def call(names: nil)
           names = manga_names(names)
           names.one? ? list_detail(names.first) : list(names)
         end

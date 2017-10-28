@@ -8,7 +8,7 @@ module MyManga
         desc 'Update manga from your library'
         argument :names, desc: 'Manga names (comma separated)'
 
-        def call(names:, **options)
+        def call(names: nil, **options)
           names = manga_names(names)
 
           puts 'Fetching Manga'

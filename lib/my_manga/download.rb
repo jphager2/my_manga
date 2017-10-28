@@ -18,7 +18,7 @@ module MyManga
         option :to,
                desc: 'Last chapter to download (must be used with FROM)'
 
-        def call(names:, **options)
+        def call(names: nil, **options)
           names = manga_names(names)
           numbers = if options[:list]
                       options[:list].to_s.split(',').map(&:strip)

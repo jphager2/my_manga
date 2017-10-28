@@ -19,7 +19,7 @@ module MyManga
         option :to,
                desc: 'Last chapter to mark (must be used with FROM)'
 
-        def call(flag:, names:, **options)
+        def call(flag:, names: nil, **options)
           names = manga_names(names)
           if options[:list]
             numbers = options[:list].to_s.split(',').map(&:strip)
