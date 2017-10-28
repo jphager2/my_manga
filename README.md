@@ -1,3 +1,4 @@
+TODO: Don't test cli with binary. Test the lib.
 TODO: Check out http://piotrmurach.github.io/tty/gems/ to make this gem better
 
 ```
