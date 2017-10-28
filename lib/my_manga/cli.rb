@@ -18,6 +18,15 @@ module MyManga
     module Commands
       extend Hanami::CLI::Registry
 
+      # see desc
+      class Version < MyManga::CLI::Command
+        desc 'Print version'
+
+        def call(*)
+          puts MyManga::VERSION
+        end
+      end
+
       register 'version', Version, aliases: %w[v -v --version]
       register 'find', Find, aliases: %w[search]
       register 'add', Add
