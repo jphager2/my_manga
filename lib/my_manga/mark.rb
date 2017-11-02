@@ -23,7 +23,7 @@ module MyManga
           names = manga_names(names)
           if options[:list]
             numbers = options[:list].to_s.split(',').map(&:strip)
-            output ||= chapters.join(', ')
+            output ||= numbers.join(', ')
           elsif options[:to]
             numbers = (options.fetch(:from)..options.fetch(:to)).to_a
             output = [numbers.first, numbers.last].join('-')
