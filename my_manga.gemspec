@@ -2,7 +2,7 @@
 
 require_relative 'lib/my_manga/version'
 
-files = Dir.glob(Dir.pwd + '/**/*.rb')
+files = Dir.glob(Dir.pwd + '/**/*.{rb,yml}')
 files.collect! { |file| file.sub(Dir.pwd + '/', '') }
 files.push('LICENSE', 'README.md')
 
@@ -16,6 +16,7 @@ Gem::Specification.new do |s|
   s.authors = ['jphager2']
   s.email = 'jphager2@gmail.com'
   s.files = files
+  s.executables = ['my_manga']
   s.license = 'MIT'
 
   s.add_runtime_dependency 'activerecord', '~> 5.0'

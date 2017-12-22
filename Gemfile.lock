@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    my_manga (1.0.1)
+    my_manga (1.1.0)
       activerecord (~> 5.0)
       hanami-cli (~> 0.1.0)
       mangdown (~> 0.17.0)
