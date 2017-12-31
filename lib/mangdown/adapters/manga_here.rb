@@ -1,7 +1,7 @@
 class MangaHere < Mangdown::Adapter::Base
   site :manga_here
 
-  ROOT = 'http://www.mangahere.co/'.freeze
+  ROOT = 'http://www.mangahere.cc/'.freeze
   CDNS = [
     'http://l.mhcdn.net/store/manga/',
     'https://mhcdn.secure.footprint.net/store/manga/'
