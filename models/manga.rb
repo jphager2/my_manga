@@ -19,7 +19,7 @@ class Manga < ActiveRecord::Base
       chapter.manga = self
       chapter.save
     end
-    self.total_count = fetched_chapters.length
+    self.total_count = chapters.count
     save!
   end
 
