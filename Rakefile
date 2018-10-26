@@ -18,6 +18,10 @@ namespace :db do
     MyManga::DB.migrate
   end
 
+  task :restore do
+    MyManga::DB.restore
+  end
+
   task :dump do
     MyManga::DB.dump
   end

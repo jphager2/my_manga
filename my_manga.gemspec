@@ -19,10 +19,10 @@ Gem::Specification.new do |s|
   s.executables = ['my_manga']
   s.license = 'MIT'
 
-  s.add_runtime_dependency 'activerecord', '~> 5.0'
+  s.add_runtime_dependency 'activerecord', '~> 5.2'
   s.add_runtime_dependency 'hanami-cli', '~> 0.1.0'
-  s.add_runtime_dependency 'mangdown', '~> 0.17.5'
-  s.add_runtime_dependency 'pg', '~> 0.21'
+  s.add_runtime_dependency 'mangdown', '~> 0.18.0'
+  s.add_runtime_dependency 'pg', '~> 1.1'
 
   s.add_development_dependency 'rubocop'
   s.add_development_dependency 'minitest'

@@ -30,6 +30,34 @@ module MyManga
     Manga.pluck(:name)
   end
 
+  def add_to_zine(names)
+    manga = Manga.where(name: names)
+
+    manga = zine + manga
+
+    File.open(zine_path, 'w') { |f| f.write(YAML.dump(manga.map(&:name))) }
+  end
+
+  def remove_from_zine(names)
+    manga = Manga.where(name: names)
+
+    manga = zine - manga
+
+    File.open(zine_path, 'w') { |f| f.write(YAML.dump(manga.map(&:name))) }
+  end
+
+  def zine
+    return [] unless File.exist?(zine_path)
+
+    names = YAML.load_file(zine_path)
+
+    Manga.where(name: names)
+  end
+
+  def zine_path
+    path = File.expand_path('./.manga.yml', MyManga.download_dir)
+  end
+
   def add(uri)
     return if Manga.find_by_uri(uri)
 
