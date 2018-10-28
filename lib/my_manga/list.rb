@@ -13,6 +13,8 @@ module MyManga
           names.one? ? list_detail(names.first) : list(names)
         end
 
+        private
+
         def list(names)
           column_width = names.map(&:length).max || 10
 
@@ -21,13 +23,12 @@ module MyManga
           print pad('Name', column_width)
           puts 'Zine Chapters read/total (unread)'
 
-          zine_manga = MyManga.zine
           names.sort.each do |name|
             manga = MyManga[name]
             read = manga.read_count
             total = manga.total_count
             unread = total - read
-            zine = zine_manga.include?(manga) ? 'zine' : '    '
+            zine = check_box(manga.zine?)
 
             print pad(name, column_width)
             puts "#{zine} #{read}/#{total} (#{unread}) #{manga.uri}"
@@ -37,11 +38,11 @@ module MyManga
         def list_detail(name)
           manga = MyManga[name]
           header = %(Manga details for "#{manga.name}")
-          chapters = manga.chapters_read
+          chapters = manga.chapters.reorder(number: :desc)
           read = manga.read_count
           total = manga.total_count
           unread = total - read
-          zine = MyManga.zine.include?(manga) ? 'zine' : '   '
+          zine = check_box(manga.zine?)
 
           puts header
           puts '=' * header.length
@@ -49,13 +50,17 @@ module MyManga
           puts 'Zine Chapters read/total (unread)'
           puts "#{name}  #{zine} #{read}/#{total} (#{unread}) #{manga.uri}"
           puts
-          puts 'Chapters Read'
-          puts '-------------'
-          chapters[0..2].each do |chapter|
-            puts chapter.name
+
+
+          puts 'Read Chapter'
+          puts '------------'
+          chapters.each do |chapter|
+            puts "#{chapter.read? ? ' [X]' : ' [ ]'} #{chapter.name}"
           end
-          puts '...' if chapters.length > 4
-          puts chapters[-1].name if chapters.length > 3
+        end
+
+        def check_box(bool)
+          bool ? ' [X]' : ' [ ]'
         end
       end
     end
