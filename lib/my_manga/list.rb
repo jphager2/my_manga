@@ -19,16 +19,18 @@ module MyManga
           puts 'Manga list'
           puts '=========='
           print pad('Name', column_width)
-          puts 'Chapters read/total (unread)'
+          puts 'Zine Chapters read/total (unread)'
 
+          zine_manga = MyManga.zine
           names.sort.each do |name|
             manga = MyManga[name]
             read = manga.read_count
             total = manga.total_count
             unread = total - read
+            zine = zine_manga.include?(manga) ? 'zine' : '    '
 
             print pad(name, column_width)
-            puts "#{read}/#{total} (#{unread}) #{manga.uri}"
+            puts "#{zine} #{read}/#{total} (#{unread}) #{manga.uri}"
           end
         end
 
@@ -39,12 +41,13 @@ module MyManga
           read = manga.read_count
           total = manga.total_count
           unread = total - read
+          zine = MyManga.zine.include?(manga) ? 'zine' : '   '
 
           puts header
           puts '=' * header.length
           print pad('Name', name.length)
-          puts 'Chapters read/total (unread)'
-          puts "#{name}  #{read}/#{total} (#{unread}) #{manga.uri}"
+          puts 'Zine Chapters read/total (unread)'
+          puts "#{name}  #{zine} #{read}/#{total} (#{unread}) #{manga.uri}"
           puts
           puts 'Chapters Read'
           puts '-------------'

@@ -7,13 +7,13 @@ default: &default
   host: <%= ENV["PG_HOST"] %>
   reconnect: false
   # Set these in .bashrc or .bash_profile
-  username: <%= ENV["PG_USER"] %> 
+  username: <%= ENV["PG_USER"] %>
   password: <%= ENV["PG_PASS"] %>
 
 production:
   <<: *default
-  database: my_manga_library_database
+  database: my_manga
 
 test:
   <<: *default
-  database: my_manga_library_test_database
+  database: my_manga_test

@@ -11,6 +11,7 @@ require_relative './update'
 require_relative './mark'
 require_relative './env'
 require_relative './m_clean_up'
+require_relative './zine'
 
 module MyManga
   module CLI
@@ -37,6 +38,7 @@ module MyManga
       register 'mark', Mark
       register 'env', Env, aliases: %w[-e --environment]
       register 'm:clean_up', MCleanUp, aliases: %w[purge]
+      register 'zine', Zine
     end
   end
 end

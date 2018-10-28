@@ -13,19 +13,19 @@ class FeaturesTest < Minitest::Test
           name: 'Assassination Classroom',
           read_count: 0,
           total_count: 161,
-          uri: 'http://www.mangareader.net/assassination-classroom'
+          uri: 'https://www.mangareader.net/assassination-classroom'
         },
         {
           name: 'Naruto',
           read_count: 699,
           total_count: 700,
-          uri: 'http://www.mangareader.net/naruto'
+          uri: 'https://www.mangareader.net/naruto'
         },
         {
           name: 'Naruto Movie',
           read_count: 10,
           total_count: 10,
-          uri: 'http://www.mangareader.net/naruto-movie'
+          uri: 'https://www.mangareader.net/naruto-movie'
         }
       ]
     )
@@ -63,7 +63,7 @@ class FeaturesTest < Minitest::Test
     )
     output = stdout.read
     header = 'Manga found for "assassination classroom"'
-    url = 'http://www.mangareader.net/assassination-classroom'
+    url = 'https://www.mangareader.net/assassination-classroom'
 
     assert_equal 0, wait_thr.value
     assert_includes output, header
@@ -72,7 +72,7 @@ class FeaturesTest < Minitest::Test
 
   def test_add
     _, stdout, _, wait_thr = Open3.popen3(
-      'my_manga', 'add', 'http://www.mangareader.net/nisekoi'
+      'my_manga', 'add', 'https://www.mangareader.net/nisekoi'
     )
     output = stdout.each_line.to_a
     expected = <<~EXP
@@ -107,9 +107,9 @@ class FeaturesTest < Minitest::Test
       Manga list
       ==========
       Name                     Chapters read/total (unread)
-      Assassination Classroom  0/161 (161) http://www.mangareader.net/assassination-classroom
-      Naruto                   699/700 (1) http://www.mangareader.net/naruto
-      Naruto Movie             10/10 (0) http://www.mangareader.net/naruto-movie
+      Assassination Classroom  0/161 (161) https://www.mangareader.net/assassination-classroom
+      Naruto                   699/700 (1) https://www.mangareader.net/naruto
+      Naruto Movie             10/10 (0) https://www.mangareader.net/naruto-movie
     EXP
     expected = expected.split("\n").map { |line| line << "\n" }
 
@@ -124,7 +124,7 @@ class FeaturesTest < Minitest::Test
       Manga details for "Naruto Movie"
       ================================
       Name          Chapters read/total (unread)
-      Naruto Movie  10/10 (0) http://www.mangareader.net/naruto-movie
+      Naruto Movie  10/10 (0) https://www.mangareader.net/naruto-movie
 
       Chapters Read
       -------------

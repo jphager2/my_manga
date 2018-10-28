@@ -1,14 +1,16 @@
 module MyManga
-  class DB 
+  module DB
     MIGRATION_PATH = File.expand_path('../migrate', __FILE__)
     CONFIG_PATH = File.expand_path('../config.yml', __FILE__)
     CONFIG = YAML.load(ERB.new(File.read(CONFIG_PATH)).result)[MyManga.env]
 
-    def self.establish_connection
-      ActiveRecord::Base.establish_connection(CONFIG)
-    end 
+    module_function
 
-    def self.establish_base_connection
+    def establish_connection
+      ActiveRecord::Base.establish_connection(CONFIG)
+    end
+
+    def establish_base_connection
       ActiveRecord::Base.establish_connection(
         CONFIG.merge(
           {
@@ -19,26 +21,28 @@ module MyManga
       )
     end
 
-    def self.connection
+    def connection
       ActiveRecord::Base.connection
     end
 
-    def self.create_database
+    def create_database
       connection.create_database(CONFIG["database"], CONFIG)
     end
 
-    def self.drop_database
+    def drop_database
       connection.drop_database(CONFIG["database"])
     end
 
-    def self.migrate
-      ActiveRecord::Migrator.migrate(MIGRATION_PATH, nil)
+    def migrate
+      ActiveRecord::MigrationContext.new(MIGRATION_PATH).migrate
     end
 
-    def self.dump
+    def restore
+      system("pg_restore --verbose --clean --no-acl --no-owner -d #{CONFIG["database"]} #{File.expand_path(__dir__)}/latest.dump")
+    end
+
+    def dump
       system("pg_dump -Fc #{CONFIG["database"]} > #{File.expand_path(__dir__)}/latest.dump")
     end
   end
 end
-
-

@@ -30,6 +30,18 @@ module MyManga
     Manga.pluck(:name)
   end
 
+  def add_to_zine(names)
+    Manga.where(name: names).update(zine: true)
+  end
+
+  def remove_from_zine(names)
+    Manga.where(name: names).update(zine: false)
+  end
+
+  def zine
+    Manga.where(zine: true)
+  end
+
   def add(uri)
     return if Manga.find_by_uri(uri)
 
