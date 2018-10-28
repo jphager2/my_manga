@@ -31,31 +31,15 @@ module MyManga
   end
 
   def add_to_zine(names)
-    manga = Manga.where(name: names)
-
-    manga = zine + manga
-
-    File.open(zine_path, 'w') { |f| f.write(YAML.dump(manga.map(&:name))) }
+    Manga.where(name: names).update(zine: true)
   end
 
   def remove_from_zine(names)
-    manga = Manga.where(name: names)
-
-    manga = zine - manga
-
-    File.open(zine_path, 'w') { |f| f.write(YAML.dump(manga.map(&:name))) }
+    Manga.where(name: names).update(zine: false)
   end
 
   def zine
-    return [] unless File.exist?(zine_path)
-
-    names = YAML.load_file(zine_path)
-
-    Manga.where(name: names)
-  end
-
-  def zine_path
-    path = File.expand_path('./.manga.yml', MyManga.download_dir)
+    Manga.where(zine: true)
   end
 
   def add(uri)

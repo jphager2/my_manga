@@ -13,26 +13,24 @@ module MyManga
         option :add,
                type: :boolean,
                default: false,
-               desc: 'Add manga to zine',
-               aliases: %w[-a]
+               desc: 'Add manga to zine'
         option :remove,
                type: :boolean,
                default: false,
-               desc: 'Remove manga from zine',
-               aliases: %w[-r --delete]
+               desc: 'Remove manga from zine'
         option :size,
                default: '10',
-               desc: 'Number of chapters to include in the zine',
-               aliases: %w[-s]
+               desc: 'Number of chapters to include in the zine'
         option :filename,
-               desc: 'Filename for the zine, (default `zine-<timestamp>-<hash of chapters included>`)',
-               aliases: %w[-f]
+               desc: 'Filename for the zine, (default `zine-<timestamp>-<hash of chapters included>`)'
 
         TMP_DIR = File.expand_path('../../tmp', __dir__)
 
-        def call(names: [], **options)
+        def call(names: nil, **options)
+          names = manga_names(names)
           filename = options.fetch(:filename) { nil }
           size = options.fetch(:size).to_i
+
           if options[:add] && options[:remove]
             puts "--add and --remove are mutually exclusive"
             exit 1
@@ -40,12 +38,13 @@ module MyManga
 
           if options[:add]
             MyManga.add_to_zine(names)
+            puts %("#{names.join(', ')}" added to the zine!)
           elsif options[:remove]
             MyManga.remove_from_zine(names)
+            puts %("#{names.join(', ')}" removed from the zine!)
           else
             publish(filename, size)
           end
-          puts %("#{name}" removed from your library!)
         end
 
         private
@@ -70,6 +69,8 @@ module MyManga
           cbz(dir)
 
           FileUtils.rm_r(TMP_DIR)
+
+          puts "Pushlished a new zine (#{filename}) in #{MyManga.download_dir}"
         end
 
         def zine_content(chapter_count)
