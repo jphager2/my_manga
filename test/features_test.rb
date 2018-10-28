@@ -106,10 +106,10 @@ class FeaturesTest < Minitest::Test
     expected = <<~EXP
       Manga list
       ==========
-      Name                     Chapters read/total (unread)
-      Assassination Classroom  0/161 (161) https://www.mangareader.net/assassination-classroom
-      Naruto                   699/700 (1) https://www.mangareader.net/naruto
-      Naruto Movie             10/10 (0) https://www.mangareader.net/naruto-movie
+      Name                     Zine Chapters read/total (unread)
+      Assassination Classroom   [ ] 0/161 (161) https://www.mangareader.net/assassination-classroom
+      Naruto                    [ ] 699/700 (1) https://www.mangareader.net/naruto
+      Naruto Movie              [ ] 10/10 (0) https://www.mangareader.net/naruto-movie
     EXP
     expected = expected.split("\n").map { |line| line << "\n" }
 
@@ -123,16 +123,21 @@ class FeaturesTest < Minitest::Test
     expected = <<~EXP
       Manga details for "Naruto Movie"
       ================================
-      Name          Chapters read/total (unread)
-      Naruto Movie  10/10 (0) https://www.mangareader.net/naruto-movie
+      Name          Zine Chapters read/total (unread)
+      Naruto Movie   [ ] 10/10 (0) https://www.mangareader.net/naruto-movie
 
-      Chapters Read
-      -------------
-      Naruto Movie 1
-      Naruto Movie 2
-      Naruto Movie 3
-      ...
-      Naruto Movie 10
+      Read Chapter
+      ------------
+       [X] Naruto Movie 1
+       [X] Naruto Movie 2
+       [X] Naruto Movie 3
+       [X] Naruto Movie 4
+       [X] Naruto Movie 5
+       [X] Naruto Movie 6
+       [X] Naruto Movie 7
+       [X] Naruto Movie 8
+       [X] Naruto Movie 9
+       [X] Naruto Movie 10
     EXP
     expected = expected.split("\n").map { |line| line << "\n" }
 
