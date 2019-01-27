@@ -7,7 +7,7 @@ module MyManga
     module Commands
       # See desc
       class Zine < MyManga::CLI::Command
-        desc 'Build a new zine'
+        desc 'Build a new zine, or manage zine manga'
         argument :names, desc: 'Manga names (comma separated)'
 
         option :add,
