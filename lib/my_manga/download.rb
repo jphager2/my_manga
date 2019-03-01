@@ -39,6 +39,8 @@ module MyManga
 
           puts '...'
           puts 'Finished Download!'
+        rescue Mangdown::Error => e
+          puts "Failed to download: #{e.message}"
         end
       end
     end

@@ -21,7 +21,7 @@ Gem::Specification.new do |s|
 
   s.add_runtime_dependency 'activerecord', '~> 5.2'
   s.add_runtime_dependency 'hanami-cli', '~> 0.1.0'
-  s.add_runtime_dependency 'mangdown', '~> 0.19.0'
+  s.add_runtime_dependency 'mangdown', '~> 0.20.0'
   s.add_runtime_dependency 'pg', '~> 1.1'
 
   s.add_development_dependency 'rubocop'
