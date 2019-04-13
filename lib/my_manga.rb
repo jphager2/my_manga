@@ -7,9 +7,11 @@ require 'mangdown/client'
 
 require_relative 'my_manga/cli'
 require_relative 'mangdown/adapters/manga_here'
+require_relative 'mangdown/adapters/manga_bat'
 
 Mangdown.register_adapter(:manga_here, MangaHere)
 M.manga_pages << 'http://www.mangahere.cc/mangalist/'
+Mangdown.register_adapter(:manga_here, MangaBat)
 
 module MyManga
   module_function
