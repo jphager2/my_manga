@@ -6,12 +6,6 @@ require 'hanami/cli'
 require 'mangdown/client'
 
 require_relative 'my_manga/cli'
-require_relative 'mangdown/adapters/manga_here'
-require_relative 'mangdown/adapters/manga_bat'
-
-Mangdown.register_adapter(:manga_here, MangaHere)
-M.manga_pages << 'http://www.mangahere.cc/mangalist/'
-Mangdown.register_adapter(:manga_here, MangaBat)
 
 module MyManga
   module_function
@@ -21,7 +15,7 @@ module MyManga
   end
 
   def find(search)
-    M.find(Regexp.new(search, 'i'))
+    Mangdown::Client.find(search)
   end
 
   def package(dir)
@@ -47,7 +41,7 @@ module MyManga
   def add(uri)
     return if Manga.find_by_uri(uri)
 
-    md_manga = Mangdown::MDHash.new(uri: uri).to_manga
+    md_manga = Mangdown.manga(uri)
     Manga.from_md(md_manga)
   end
 
@@ -97,7 +91,7 @@ module MyManga
   end
 
   def mangdown_client_clean_up
-    M.clean_up
+    Mangdown::Client.index_manga
   end
 
   # @private

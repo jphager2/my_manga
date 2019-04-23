@@ -16,10 +16,10 @@ module MyManga
 
           return if results.empty?
 
-          column_width = results.map { |r| r[:name].length }.max
+          column_width = results.map { |r| r.name.length }.max
           puts pad('Name', column_width) + 'Url'
           results.each do |result|
-            puts pad(result[:name], column_width) + result[:uri]
+            puts pad(result.name, column_width) + result.uri
           end
         end
       end
